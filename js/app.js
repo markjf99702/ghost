@@ -212,6 +212,8 @@ async function run() {
     return;
   }
   await board.glideTo('yes', 700);
+  if (my !== gen) return;
+  if (s.challenge.extra) setState(R.setExtra(s, ''), { quiet: true }); // picked up again after a reload
   for (const c of word.slice(s.frag.length)) {
     if (my !== gen) return;
     await board.glideTo(c, 560);
