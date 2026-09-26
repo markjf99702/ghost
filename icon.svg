@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="night" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b2640"/>
+      <stop offset="1" stop-color="#13111c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".46" r=".5">
+      <stop offset="0" stop-color="#cfe0ff" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#cfe0ff" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="tile"><rect width="64" height="64" rx="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="64" height="64" fill="url(#night)"/>
+    <circle cx="32" cy="30" r="27" fill="url(#glow)"/>
+    <path d="M32 10.5c-10.2 0-16.3 7.9-16.3 18V52.5q2.72 4 5.43 0q2.72 4 5.43 0q2.72 4 5.43 0q2.72 4 5.43 0q2.72 4 5.43 0q2.72 4 5.43 0V28.5c0-10.1-6.1-18-16.3-18Z" fill="#eef2fd"/>
+    <ellipse cx="26.2" cy="29" rx="3.2" ry="3.9" fill="#232033"/>
+    <ellipse cx="37.8" cy="29" rx="3.2" ry="3.9" fill="#232033"/>
+    <ellipse cx="32" cy="38.2" rx="2.2" ry="2.8" fill="#232033"/>
+  </g>
+</svg>
