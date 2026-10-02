@@ -1,6 +1,6 @@
 # Ghost
 
-**Play it: [junkdrawer.works/ghost](https://junkdrawer.works/ghost/)**
+**Play it: [ghost.junkdrawer.works](https://ghost.junkdrawer.works/)**
 
 **The old spelling game, played on a spirit board.** Players take turns adding a letter to a word in progress. Finish a real word and you lose the round. Lose five rounds and you've spelled GHOST, and you're out. Play against three ghosts of different strengths, or pass the phone around a table of friends.
 

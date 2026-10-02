@@ -2,9 +2,9 @@
 // The game in progress and your record live in localStorage, not here.
 // Network first, so a new version shows up as soon as you're online.
 
-const CACHE = 'ghost-v1'; // bump the number when the file list changes
+const CACHE = 'ghost-v2'; // bump the number when the file list changes
 const SHELL = [
-  './', 'index.html', 'icon.svg', 'icon-180.png', 'manifest.webmanifest', 'css/app.css',
+  './', 'index.html', 'carry.js', 'icon.svg', 'icon-180.png', 'manifest.webmanifest', 'css/app.css',
   'js/app.js', 'js/board.js', 'js/art.js', 'js/rules.js', 'js/ghosts.js', 'js/dict.js', 'js/packed.js',
   'js/words-ends.js', 'js/words-more.js',
   'fonts/cinzel.woff2', 'fonts/eb-garamond.woff2', 'fonts/eb-garamond-italic.woff2',
