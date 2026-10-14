@@ -143,6 +143,18 @@ await until(() => !document.getElementById('result').hidden);
 assert.match(await page.locator('#resultKicker').textContent(), /bluffing/i);
 assert.match(await page.locator('.result-loser').textContent(), /Wisp takes a G/);
 
+// The board's own NO and YES work for you (the first seat), not just the plaques.
+await setUp(`(R, d) => R.addLetter(R.addLetter(${youAndWisp}, 'q', d.endsRound), 'z', d.endsRound, { bluff: true })`);
+await tapCorner('no');
+await until(() => !document.getElementById('result').hidden);
+assert.match(await page.locator('#resultKicker').textContent(), /bluffing/i, 'NO didn’t challenge Wisp');
+await setUp(`(R, d) => R.challenge(['g', 'h', 'o'].reduce((st, c) => R.addLetter(st, c, d.endsRound), ${youAndWisp}))`);
+await tap('s');
+await tap('t');
+await tapCorner('yes');
+await until(() => !document.getElementById('result').hidden);
+assert.equal(await page.locator('#resultWord').textContent(), 'GHOST', 'YES didn’t name GHOST');
+
 // A ghost challenges a letter that goes nowhere.
 await setUp(`(R) => ({ ...${youAndWisp}, frag: 'qu', last: 1, turn: 0 })`);
 await tap('x');

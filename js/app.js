@@ -126,8 +126,8 @@ const board = new Board($('board'), {
   onPreview: c => { preview = c; renderWord(); },
   onPick: c => pick(c),
   onCorner: c => {
-    if (c === 'no' && R.canChallenge(s) && personToAct()) doChallenge();
-    if (c === 'yes' && s.phase === 'naming' && personToAct()) submitWord();
+    if (c === 'no' && R.canChallenge(s) && personToAct() !== null) doChallenge();
+    if (c === 'yes' && s.phase === 'naming' && personToAct() !== null) submitWord();
   },
 });
 
