@@ -1,6 +1,6 @@
 // The word lists are stored front-coded to keep them small: each line starts with one character saying how many
 // letters it shares with the line before ('0' for none, '1' for one, and so on), followed by the rest of it.
-// "ghost, ghostly, ghosts" is stored as "0ghost / 5ly / 6s".
+// "ghost, ghostly, ghosts" is stored as "0ghost / 5ly / 5s".
 
 export function encode(lines) {
   let prev = '';

@@ -21,6 +21,7 @@ const play = (s, letters) => [...letters].reduce((st, c) => R.addLetter(st, c, d
 test('front coding round-trips', () => {
   const words = ['ghost', 'ghostly', 'ghosts', 'ghoul', 'goblin'];
   assert.deepEqual(decode(encode(words)), words);
+  assert.equal(encode(['ghost', 'ghostly', 'ghosts']), '0ghost\n5ly\n5s', 'the example in js/packed.js');
 });
 
 test('the round-ending words: four letters or more, and only ones you can reach', () => {
