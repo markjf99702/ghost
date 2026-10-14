@@ -275,6 +275,14 @@ assert.equal((await state()).frag.slice(0, frag.length), frag);
   await page.setViewportSize({ width: 390, height: 844 });
 }
 
+// A screen reader hears how many letters each player has, not G H O S T for everyone.
+await setUp(`(R) => { const s = ${youAndWisp}; s.players[0].letters = 2; s.players[1].letters = 4; return s; }`);
+{
+  const heard = await page.locator('#players').ariaSnapshot();
+  assert.match(heard, /You have G H$/m, heard);
+  assert.match(heard, /Wisp has G H O S$/m, heard);
+}
+
 // Fits a phone: nothing scrolls sideways, even on a small one, on either screen.
 for (const width of [390, 320]) {
   await page.setViewportSize({ width, height: 700 });

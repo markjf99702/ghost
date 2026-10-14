@@ -271,9 +271,11 @@ function renderPlayers() {
     li.className = `player ${p.kind}${i === acting ? ' acting' : ''}${out ? ' out' : ''}${p.ghost ? ` g-${p.ghost}` : ''}`;
     li.style.setProperty('--fade', p.kind === 'ghost' ? String(1 - p.letters * 0.15) : '1');
     const art = p.kind === 'ghost' ? ghostSvg(p.ghost) : out ? ghostSvg('wisp', 'mine') : candleSvg(p.letters, true);
+    const has = p.letters ? `${isYou(p) ? 'have' : 'has'} ${[...R.GHOST.slice(0, p.letters)].join(' ')}` : 'no letters yet';
     li.innerHTML = `<span class="avatar">${art}</span>
       <span class="pname">${esc(p.name)}</span>
-      <span class="letters" aria-label="${p.letters ? `has ${R.GHOST.slice(0, p.letters)}` : 'no letters yet'}">${[...R.GHOST].map((L, k) => `<b class="${k < p.letters ? 'got' : ''}">${L}</b>`).join('')}</span>`;
+      <span class="letters" aria-hidden="true">${[...R.GHOST].map((L, k) => `<b class="${k < p.letters ? 'got' : ''}">${L}</b>`).join('')}</span>
+      <span class="visually-hidden">${has}</span>`;
     return li;
   }));
 }
