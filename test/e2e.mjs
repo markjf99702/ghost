@@ -251,6 +251,18 @@ await page.keyboard.press('Enter'); // with no button focused, Enter names it
 await until(() => !document.getElementById('result').hidden);
 assert.equal(await page.locator('#resultWord').textContent(), 'GHOST');
 
+// After the menu, the focus is back on the Menu button. Enter still names the word, and the menu stays shut.
+await setUp(`(R) => ${youAndWisp}`);
+await page.click('#menuBtn');
+await page.click('#menuNew');
+await setUp(`(R, d) => R.setExtra(R.challenge(['g', 'h', 'o'].reduce((st, c) => R.addLetter(st, c, d.endsRound), ${youAndWisp})), 'st')`);
+assert.equal(await page.evaluate(() => document.activeElement.id), 'menuBtn');
+await page.keyboard.press('Enter');
+await page.waitForTimeout(300);
+assert.equal(await page.locator('#menu').evaluate(d => d.open), false, 'Enter on the Menu button opened the menu');
+await until(() => !document.getElementById('result').hidden);
+assert.equal(await page.locator('#resultWord').textContent(), 'GHOST');
+
 // The keyboard's focus ring shows up on the board's pale wood: at least 3:1, as WCAG asks.
 await setUp(`(R) => ${youAndWisp}`);
 await page.focus('.letter[data-letter="l"]');

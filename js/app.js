@@ -483,8 +483,12 @@ document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (/^[a-z]$/.test(k)) { pick(k); e.preventDefault(); }
   else if (k === 'backspace' && s.phase === 'naming' && personToAct() !== null && s.challenge.extra) setState(R.setExtra(s, s.challenge.extra.slice(0, -1)));
-  // Enter names the word, unless a button has the focus: then Enter is that button's (Erase, Give up, a letter).
-  else if (k === 'enter' && s.phase === 'naming' && personToAct() !== null && !e.target.closest?.('button')) submitWord();
+  // Enter names the word, unless a letter or plaque has the focus: then Enter is that button's (Erase, Give up, a letter).
+  // On the Menu button, where the focus goes back whenever the menu closes, it names the word and leaves the menu shut.
+  else if (k === 'enter' && s.phase === 'naming' && personToAct() !== null && !e.target.closest?.('.board button') && (s.frag + s.challenge.extra).length >= dict.MIN) {
+    e.preventDefault();
+    submitWord();
+  }
 });
 
 addEventListener('resize', () => renderWord());
