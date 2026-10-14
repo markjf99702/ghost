@@ -215,6 +215,21 @@ await page.evaluate(() => document.fonts.ready);
 assert.equal(await page.locator('#game').isVisible(), true);
 assert.equal((await state()).frag.slice(0, frag.length), frag);
 
+// Every card shows all of GHOST: three at the table on a phone, and six on a laptop.
+{
+  const clipped = () => page.evaluate(() => [...document.querySelectorAll('.player .letters')].filter(L => L.scrollWidth > L.clientWidth).length);
+  const seats = ['You:', 'Sam:', 'Ann:', 'Wisp:wisp', 'Maud:maud', 'Hollis:hollis'].map(t => t.split(':')).map(([name, ghost]) => (ghost ? `{ kind: 'ghost', ghost: '${ghost}', name: '${name}' }` : `{ kind: 'person', name: '${name}' }`));
+  await setUp(`(R) => R.newGame([${[seats[0], seats[4], seats[5]]}])`);
+  for (const width of [390, 360, 320]) {
+    await page.setViewportSize({ width, height: 700 });
+    assert.equal(await clipped(), 0, `GHOST is cut off with three at the table at ${width}px`);
+  }
+  await setUp(`(R) => R.newGame([${seats}])`);
+  await page.setViewportSize({ width: 1280, height: 800 });
+  assert.equal(await clipped(), 0, 'GHOST is cut off with six at the table on a laptop');
+  await page.setViewportSize({ width: 390, height: 844 });
+}
+
 // Fits a phone: nothing scrolls sideways, even on a small one, on either screen.
 for (const width of [390, 320]) {
   await page.setViewportSize({ width, height: 700 });

@@ -329,7 +329,7 @@ main { position: relative; z-index: 1; }
 .rules p strong { color: var(--ink); }
 .rules .primary { margin-top: 8px; }
 
-/* Four or more players on a phone: smaller cards, two or three to a row. */
+/* Three or more players on a phone: smaller cards, two or three to a row, so GHOST fits on each. */
 @media (max-width: 719px) {
   .players.many .player { min-width: 0; flex-basis: calc(33.333% - 4px); grid-template-columns: 24px 1fr; column-gap: 6px; padding: 6px 8px 6px 6px; }
   .players.four .player { flex-basis: calc(50% - 3px); }
@@ -339,6 +339,7 @@ main { position: relative; z-index: 1; }
 }
 @media (min-width: 720px) {
   .player { min-width: 0; }
+  .players.six .player { flex-basis: calc(33.333% - 7px); } /* six don't fit in one row: three and three */
 }
 
 @media (min-width: 720px) {

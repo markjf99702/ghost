@@ -240,8 +240,9 @@ function render() {
 
 function renderPlayers() {
   const acting = s.phase === 'play' ? s.turn : s.phase === 'naming' ? s.challenge.of : -1;
-  $('players').classList.toggle('many', s.players.length >= 4);
+  $('players').classList.toggle('many', s.players.length >= 3);
   $('players').classList.toggle('four', s.players.length === 4);
+  $('players').classList.toggle('six', s.players.length === 6);
   $('players').replaceChildren(...s.players.map((p, i) => {
     const li = document.createElement('li');
     const out = p.letters >= R.GHOST.length;
