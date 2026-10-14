@@ -39,6 +39,7 @@ npm test                      # the rules, the dictionary and the ghosts (Node 2
 node tools/screenshots.mjs    # redraws docs/*.png and og.png
 node tools/make-icons.mjs     # redraws the PNG icons from icon.svg
 node tools/build-words.mjs    # rebuilds the word lists from their sources (downloads them the first time)
+npm run sim                   # how often a beginner and a careful player beat each ghost, and how the ghosts do against each other
 npm run build                 # dist/ghost.html, the whole game in one file
 ```
 
@@ -57,7 +58,7 @@ To put it online with GitHub Pages: **Settings → Pages → Build and deploymen
 - `js/app.js`: the page: choosing who plays, turns, the ghosts' moves, the end of each round, and saving.
 - `fonts/`: Cinzel and EB Garamond (SIL Open Font License), served from here so nothing loads from elsewhere.
 - `sw.js`: keeps a copy for playing offline. `npm test` checks that it lists every file the page needs.
-- `tools/`: the screenshot, icon and word-list scripts above. `scripts/build.mjs`: the single-file build.
+- `tools/`: the screenshot, icon, word-list and sim scripts above. `scripts/build.mjs`: the single-file build.
 
 The game is on `window.ghostGame` if you want to poke at it from the console:
 
