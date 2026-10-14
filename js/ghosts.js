@@ -10,7 +10,7 @@ export const GHOSTS = [
   {
     id: 'wisp', name: 'Wisp', level: 'Easy',
     about: 'Knows everyday words. Plays by feel and often walks into trouble.',
-    knows: dict.EVERYDAY, sharp: 0.35, bluff: 0.3, deep: false,
+    knows: dict.EVERYDAY, sharp: 0.2, bluff: 0.3, deep: false,
   },
   {
     id: 'maud', name: 'Maud', level: 'Medium',
