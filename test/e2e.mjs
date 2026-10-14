@@ -230,6 +230,18 @@ await page.keyboard.press('Enter'); // with no button focused, Enter names it
 await until(() => !document.getElementById('result').hidden);
 assert.equal(await page.locator('#resultWord').textContent(), 'GHOST');
 
+// The keyboard's focus ring shows up on the board's pale wood: at least 3:1, as WCAG asks.
+await setUp(`(R) => ${youAndWisp}`);
+await page.focus('.letter[data-letter="l"]');
+await page.keyboard.press('Tab');
+{
+  const ring = await page.evaluate(() => { const a = document.activeElement; return { letter: a.dataset.letter, shown: a.matches(':focus-visible'), color: getComputedStyle(a).outlineColor }; });
+  assert.deepEqual([ring.letter, ring.shown], ['m', true]);
+  const lum = rgb => rgb.match(/\d+/g).slice(0, 3).map(v => v / 255).map(v => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)).reduce((t, v, i) => t + v * [0.2126, 0.7152, 0.0722][i], 0);
+  const [a, b] = [lum(ring.color), lum('rgb(234, 210, 164)')].sort((x, y) => y - x); // --board-1, the palest wood
+  assert.ok((a + 0.05) / (b + 0.05) >= 3, `the focus ring is ${((a + 0.05) / (b + 0.05)).toFixed(2)}:1 on the board`);
+}
+
 // The keyboard works on a computer.
 await setUp(`(R) => ${youAndWisp}`);
 await page.keyboard.press('k');

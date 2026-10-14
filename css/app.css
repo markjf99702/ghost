@@ -257,6 +257,7 @@ main { position: relative; z-index: 1; }
   transition: color .15s, text-shadow .15s, scale .15s;
 }
 .letter.lit { color: #5a1d0a; text-shadow: 0 0 14px rgba(255, 230, 170, 1), 0 0 3px rgba(255, 240, 200, .9); scale: 1.18; }
+.board :focus-visible { outline-color: var(--board-ink); } /* the pale ring used elsewhere barely shows on the wood */
 .board:not(.live) .letter { cursor: default; }
 
 .plaques { z-index: 2; position: absolute; left: 16px; right: 16px; bottom: 16px; display: flex; gap: 8px; justify-content: center; }
