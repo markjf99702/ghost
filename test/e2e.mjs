@@ -105,6 +105,17 @@ await page.waitForTimeout(700); // PLA fades in, once
   await until(() => ghostGame.state().frag.length === 5);
   assert.equal(await fading(), 0, 'PLA faded in again when Wisp added a letter');
 }
+// And when you erase a letter, or the word you named is taken and the letters you added leave the table.
+await setUp(`(R, d) => R.setExtra(R.challenge(['g', 'h', 'o'].reduce((st, c) => R.addLetter(st, c, d.endsRound), ${youAndWisp})), 'stx')`);
+await page.waitForTimeout(700); // GHOSTX fades in, once
+{
+  const fading = () => page.evaluate(() => [...document.querySelectorAll('#word span:not(.cursor)')].filter(sp => sp.getAnimations().length).map(sp => sp.textContent).join(''));
+  await page.click('#erase');
+  assert.equal(await fading(), '', 'GHOST faded in again when you erased the X');
+  await page.click('#done');
+  await until(() => ghostGame.state().phase !== 'naming');
+  assert.equal(await fading(), '', 'GHO faded in again when GHOST was taken');
+}
 await page.emulateMedia({ reducedMotion: 'reduce' });
 
 // Challenged: spell the rest of a word on the board and say yes.

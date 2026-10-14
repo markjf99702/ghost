@@ -287,9 +287,11 @@ function renderWord() {
   const extra = naming ? s.challenge.extra : '';
   const person = personToAct() !== null;
   const pend = person && preview && !(naming && extra.length >= 20) ? preview : '';
-  // Only letters that weren't showing last time fade in, so the word holds still while you choose the next one.
+  // Only letters that weren't showing last time fade in, so the word holds still while you choose the next one,
+  // when you erase one, and when the letters after a challenge leave the table.
   const word = s.frag + extra;
-  const from = word.startsWith(shown) ? shown.length : 0;
+  let from = 0;
+  while (from < word.length && word[from] === shown[from]) from++;
   shown = word;
   const parts = [...word].map((c, k) => {
     const cls = [k >= s.frag.length ? 'extra' : '', k >= from ? 'new' : ''].join(' ').trim();
