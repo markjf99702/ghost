@@ -59,11 +59,12 @@ function scowl(size) {
 const RUDE = ['anality', 'anally', 'asslike', 'boobie', 'buttock', 'cockish', 'cockup', 'cummed', 'cummer', 'cumshaw', 'dicked',
   'dickey', 'dickie', 'dickier', 'dickiest', 'dicking', 'dicky', 'mongo', 'mongoe', 'raped', 'raper', 'sext', 'spick', 'spunked',
   'spunkie', 'spunking', 'tittie'];
-const SLURS = ['abo', 'coolie', 'dago', 'darkey', 'darky', 'dyke', 'dyked', 'dyking', 'golliwog', 'golliwogg', 'gollywog', 'gook',
-  'gyp', 'gypped', 'gypper', 'gypping', 'gypsy', 'hebe', 'homo', 'honky', 'kraut', 'lezzie', 'mulatto', 'octoroon', 'peckerwood',
-  'pickaninny', 'quadroon', 'redskin', 'sambo', 'spaz', 'spazzes', 'squaw', 'whitey', 'whities', 'wog', 'wop', 'yid'];
+const SLURS = ['abo', 'boche', 'cholo', 'coolie', 'dago', 'darkey', 'darky', 'dyke', 'dyked', 'dykey', 'dyking', 'golliwog', 'golliwogg',
+  'gollywog', 'gook', 'gyp', 'gypped', 'gypper', 'gypping', 'gypsied', 'gypsy', 'hebe', 'homo', 'honky', 'kaffir', 'kafir', 'kraut',
+  'lezzie', 'lubra', 'mick', 'mulatto', 'octoroon', 'peckerwood', 'pickaninny', 'quadroon', 'redskin', 'sambo', 'shiksa', 'shikse',
+  'spaz', 'spazzes', 'squaw', 'whitey', 'whities', 'wog', 'wop', 'yid'];
 const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bullshit', 'clitor', 'cocksuck', 'coprophil',
-  'dickhead', 'dildo', 'erotic', 'eunuch', 'fagg', 'fagin', 'fago', 'fellatio', 'fuck', 'gangbang', 'grope', 'homoerotic',
+  'dickhead', 'dildo', 'erotic', 'eunuch', 'fagg', 'fagin', 'fago', 'fellatio', 'fuck', 'gangbang', 'grope', 'gypsy', 'homoerotic',
   'incest', 'masturbat', 'mongol', 'negroid', 'negrophob', 'nigga', 'nigger', 'nipple', 'nude', 'nympho', 'orgasm', 'pantyliner',
   'pooft', 'porn', 'retard', 'scatolog', 'sexed', 'sexie', 'sexil', 'sexin', 'sexless', 'sexolog', 'sexploit', 'sexpot',
   'sexting', 'sexual', 'shit', 'slut', 'smutt', 'sodomiz', 'spastic', 'topless', 'twat', 'vagina', 'voyeur', 'vulva', 'wank',

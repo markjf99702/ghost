@@ -54,9 +54,12 @@ test('words that only start with a rude word are ordinary words, and rude words 
   for (const w of ['fucked', 'bitchy', 'whorehouse', 'cocksucker', 'sexy', 'orgies', 'pussies']) assert.ok(!dict.isWord(w), `${w} counts`);
 });
 
-test('slurs the filter list misses are left out too, so a ghost never spells or names one', () => {
+test('slurs the filter list misses are left out too, so a ghost never names one', () => {
   for (const w of ['dyke', 'dykes', 'gook', 'gyps', 'gypped', 'mulatto', 'squaw', 'retard', 'retarded', 'dago', 'dagoes', 'wops', 'yids',
     'wogs', 'sambo', 'spaz', 'hebe', 'golliwog', 'abos', 'kraut', 'redskin', 'pickaninnies']) assert.ok(!dict.isWord(w), `${w} counts`);
+  // Words made from them, which once DYKE and GYPS stopped cutting them off a cornered ghost could reach and name.
+  for (const w of ['dykey', 'gypsydom', 'gypsyish', 'gypsyism', 'gypsying', 'gypsied']) assert.ok(!dict.isWord(w), `${w} counts`);
+  for (const w of ['kaffir', 'kafirs', 'boche', 'lubra', 'micks', 'shiksa', 'shikse', 'cholo']) assert.ok(!dict.isWord(w), `${w} counts`);
   assert.ok(dict.endsRound('squawk'), 'SQUAW no longer cuts off SQUAWK');
 });
 
