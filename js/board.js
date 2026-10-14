@@ -20,6 +20,7 @@ export class Board {
     this.spots = {};
     this.pos = null;
     this.pointerAt = -Infinity;
+    this.trip = 0; // bumps when the planchette is sent home, so a ghost's glide that was under way doesn't land
 
     el.innerHTML = `
       <div class="frame" aria-hidden="true"></div>
@@ -120,6 +121,7 @@ export class Board {
   async glideTo(target, ms = 850) {
     const to = this.spots[target];
     if (!to) return;
+    const trip = this.trip;
     const from = this.pos || this.rest;
     const p = this.planchette;
     const w = p.offsetWidth, h = p.offsetHeight;
@@ -130,8 +132,9 @@ export class Board {
     p.style.transition = 'none';
     p.classList.remove('resting');
     if (!reduceMotion()) {
-      await p.animate([{ transform: at(from) }, { transform: at(mid) }, { transform: at(to) }], { duration: ms, easing: 'ease-in-out' }).finished;
+      await p.animate([{ transform: at(from) }, { transform: at(mid) }, { transform: at(to) }], { duration: ms, easing: 'ease-in-out' }).finished.catch(() => {});
     }
+    if (trip !== this.trip) return;
     this.place(to, false);
     this.light(target);
     await wait(reduceMotion() ? 150 : 320);
@@ -140,6 +143,7 @@ export class Board {
   // Wander a little, as if thinking.
   async wander(ms = 700) {
     if (reduceMotion()) return wait(ms / 2);
+    const trip = this.trip;
     const from = this.pos || this.rest;
     const r = this.spacing * 1.2;
     const to = {
@@ -150,8 +154,8 @@ export class Board {
     const w = p.offsetWidth, h = p.offsetHeight;
     const at = ({ x, y }) => `translate(${x - w * WINDOW.x}px, ${y - h * WINDOW.y}px)`;
     p.style.transition = 'none';
-    await p.animate([{ transform: at(from) }, { transform: at(to) }], { duration: ms, easing: 'ease-in-out' }).finished;
-    this.place(to, false);
+    await p.animate([{ transform: at(from) }, { transform: at(to) }], { duration: ms, easing: 'ease-in-out' }).finished.catch(() => {});
+    if (trip === this.trip) this.place(to, false);
   }
 
   light(target) {
@@ -160,10 +164,13 @@ export class Board {
     node?.classList.add('lit');
   }
 
-  // Back to the middle of the board between rounds, faded until someone picks it up.
+  // Back to the middle of the board between rounds and games, faded until someone picks it up.
+  // A glide that's still under way stops here instead of landing on the new board.
   goHome() {
+    this.trip++;
+    for (const a of this.planchette.getAnimations()) a.cancel();
     this.light(null);
-    this.place(this.rest);
+    if (this.rest) this.place(this.rest);
     this.planchette.classList.add('resting');
   }
 

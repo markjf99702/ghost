@@ -196,6 +196,19 @@ assert.match(await page.locator('.verdict').textContent(), /Wisp wins the game/)
 await page.click('#again');
 assert.equal((await state()).round, 1);
 assert.equal(await page.locator('#result').isHidden(), true);
+assert.equal(await page.locator('#board .lit').count(), 0, 'the last game’s T is still lit');
+assert.equal(await page.locator('.planchette.resting').count(), 1, 'the planchette isn’t resting');
+
+// A new game in the middle of a ghost's move: its glide doesn't land on the new board.
+await page.emulateMedia({ reducedMotion: 'no-preference' });
+await setUp(`(R) => ({ ...${youAndWisp}, frag: 'ca', last: 0, turn: 1 })`);
+await until(() => document.querySelector('.planchette').getAnimations().some(a => a.effect.getKeyframes().length === 3)); // gliding to its letter
+await page.click('#menuBtn');
+await page.click('#menuNew');
+await page.waitForTimeout(1500);
+assert.equal(await page.locator('#board .lit').count(), 0, 'Wisp’s letter lit up on the new board');
+assert.equal((await state()).frag, '');
+await page.emulateMedia({ reducedMotion: 'reduce' });
 
 // Enter on a focused button does that button's job, without also naming the word.
 await setUp(`(R, d) => R.setExtra(R.challenge(['g', 'h', 'o'].reduce((st, c) => R.addLetter(st, c, d.endsRound), ${youAndWisp})), 'st')`);

@@ -110,6 +110,7 @@ function startGame() {
   hideResult();
   setState(R.newGame([...people, ...ghosts]));
   show('game');
+  board.goHome(); // nothing lit from the last game, and the planchette resting in the middle
 }
 
 function show(which) {
