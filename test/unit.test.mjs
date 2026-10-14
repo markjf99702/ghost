@@ -116,6 +116,48 @@ test('the game ends when the people are all out, even with ghosts left', () => {
   assert.equal(s.winner, -1, 'only ghosts are left');
 });
 
+test('a game saved at any point can be picked up again, and a damaged save is set aside', () => {
+  const rnd = seeded(5);
+  const saved = s => JSON.parse(JSON.stringify(s));
+  const seen = new Set();
+  for (let game = 0; game < 6; game++) {
+    let s = R.newGame([{ kind: 'person', name: 'You' }, { kind: 'ghost', ghost: 'wisp', name: 'Wisp' }, { kind: 'ghost', ghost: 'hollis', name: 'Hollis' }]);
+    const brain = i => ghostById(s.players[i].ghost || 'maud'); // you play like Maud
+    const check = () => { seen.add(s.phase); assert.ok(R.isGame(saved(s)), `set aside: ${JSON.stringify(s).slice(0, 300)}`); };
+    for (let steps = 0; s.phase !== 'done' && steps < 3000; steps++) {
+      check();
+      if (s.phase === 'over') { seen.add(s.result.why); s = R.nextRound(s); continue; }
+      if (s.phase === 'play') {
+        const m = chooseMove(brain(s.turn), s, rnd);
+        s = m.challenge ? R.challenge(s) : R.addLetter(s, m.letter, dict.endsRound, m.bluff ? { bluff: true } : m.rare ? { rare: true } : {});
+        continue;
+      }
+      // Challenged: a wrong try first, then the real word a letter at a time, or give up.
+      const w = nameWord(brain(s.challenge.of), s.frag, s.moves.at(-1));
+      if (!w) { s = R.giveUp(s); continue; }
+      s = R.nameWord(R.setExtra(s, 'zz'), `${s.frag}zz`, false);
+      check();
+      s = R.setExtra(s, '');
+      for (const c of w.slice(s.frag.length)) { s = R.setExtra(s, s.challenge.extra + c); check(); }
+      s = R.nameWord(s, w, true);
+    }
+    check();
+    seen.add(s.result.why);
+    assert.ok(R.isGame(saved({ ...s, recorded: true })));
+  }
+  assert.deepEqual([...seen].sort(), ['bluff', 'done', 'named', 'naming', 'over', 'play', 'spelled'], 'every kind of state came up');
+
+  const good = R.challenge(play(two(), 'gh'));
+  assert.ok(R.isGame(good));
+  const junk = [
+    null, 'null', 3, [], {}, { players: 'ab' }, { ...good, players: [] }, { ...good, players: [null, null] },
+    { ...good, frag: 7 }, { ...good, frag: 'GH' }, { ...good, moves: null }, { ...good, turn: 5 }, { ...good, phase: 'thinking' },
+    { ...good, challenge: null }, { ...good, challenge: { ...good.challenge, of: 9 } }, { ...R.giveUp(good), result: null },
+    { ...R.giveUp(good), challenge: null }, { ...R.giveUp(good), phase: 'done', winner: 7 },
+  ];
+  for (const j of junk) assert.equal(R.isGame(j), false, JSON.stringify(j));
+});
+
 test('ghosts challenge letters that can’t become a word', () => {
   const s = play(two(), 'qx');
   for (const g of GHOSTS) assert.deepEqual(chooseMove(g, { ...s, turn: 1, last: 0 }, seeded(1)), { challenge: true }, g.name);

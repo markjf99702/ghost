@@ -315,6 +315,41 @@ await ctx.setOffline(false);
   await ctx2.close();
 }
 
+// A damaged save (only a hand edit or a broken disk makes one) doesn't stop the page: it starts from the defaults.
+{
+  const ctx3 = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, reducedMotion: 'reduce', serviceWorkers: 'block' });
+  const page3 = await ctx3.newPage();
+  const uncaught = [];
+  page3.on('pageerror', e => uncaught.push(e.message));
+  await page3.goto(base);
+  const twoAtTable = '[{"kind":"person","name":"You","letters":0},{"kind":"ghost","ghost":"wisp","name":"Wisp","letters":0}]';
+  for (const [key, junk] of [
+    ['table', 'null'], ['table', '{}'], ['table', '{"people":["You"],"ghosts":["casper","maud"]}'],
+    ['record', 'null'], ['record', '{"wisp":5}'],
+    ['game', '{"players":[1,2],"phase":"play"}'],
+    ['game', `{"players":${twoAtTable},"round":1,"frag":"ab","turn":0,"last":1,"moves":[],"phase":"naming","challenge":null}`],
+  ]) {
+    await page3.evaluate(([k, v]) => { localStorage.clear(); localStorage.setItem(`ghost.${k}`, v); }, [key, junk]);
+    await page3.reload();
+    assert.equal(await page3.locator('#setup').isVisible(), true, `no table to set after ghost.${key} = ${junk}`);
+    assert.doesNotMatch(await page3.locator('#ghostPicks').textContent(), /undefined/);
+    await page3.click('#start', { timeout: 5000 });
+    assert.equal(await page3.locator('#game').isVisible(), true, `couldn’t start a game after ghost.${key} = ${junk}`);
+  }
+  // A good save comes through as it is.
+  await page3.evaluate(() => {
+    localStorage.clear();
+    localStorage.setItem('ghost.table', '{"people":["Ann","Ben"],"ghosts":["maud"]}');
+    localStorage.setItem('ghost.record', '{"maud":{"won":2,"lost":1}}');
+  });
+  await page3.reload();
+  assert.deepEqual(await page3.locator('#people input').evaluateAll(els => els.map(e => e.value)), ['Ann', 'Ben']);
+  assert.equal(await page3.locator('.ghost-pick.g-maud').getAttribute('aria-pressed'), 'true');
+  assert.match(await page3.locator('.ghost-pick.g-maud').textContent(), /2 won, 1 lost/);
+  assert.deepEqual(uncaught, [], 'errors from a damaged save');
+  await ctx3.close();
+}
+
 assert.deepEqual(problems.filter(p => !p.startsWith('failed:')), [], 'problems while playing');
 await browser.close();
 server.close();

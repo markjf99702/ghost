@@ -22,8 +22,29 @@ const store = {
   },
 };
 
-let table = store.get('table', { people: ['You'], ghosts: ['wisp'] });
-let record = store.get('record', {});
+// What comes out of storage is checked on the way in. Only a hand edit or a damaged save fails these checks, and
+// then the page starts from the defaults instead of stopping. A save the game wrote comes through as it is.
+function cleanTable(t) {
+  const ok = !!t && typeof t === 'object';
+  const people = ok && Array.isArray(t.people) && t.people.length && t.people.every(p => typeof p === 'string') ? t.people : ['You'];
+  const ghosts = ok && Array.isArray(t.ghosts) ? t.ghosts.filter((id, i) => ghostById(id) && t.ghosts.indexOf(id) === i) : ['wisp'];
+  return { people, ghosts };
+}
+
+function cleanRecord(r) {
+  const out = {};
+  for (const { id } of GHOSTS) {
+    const v = r && typeof r === 'object' ? r[id] : null;
+    if (v && Number.isInteger(v.won) && v.won >= 0 && Number.isInteger(v.lost) && v.lost >= 0) out[id] = v;
+  }
+  return out;
+}
+
+// A saved game to pick up again: the shape the rules make, ghosts this page knows, and not a finished game already counted.
+const resumable = g => R.isGame(g) && g.players.every(p => p.kind === 'person' || ghostById(p.ghost)) && !(g.phase === 'done' && g.recorded);
+
+let table = cleanTable(store.get('table', null));
+let record = cleanRecord(store.get('record', null));
 let s = null;   // the game in progress (see rules.js)
 let gen = 0;    // bumps whenever the game moves on, so a ghost that was mid-thought knows to stop
 let preview = null;
@@ -453,11 +474,16 @@ document.addEventListener('keydown', e => {
 addEventListener('resize', () => renderWord());
 
 const saved = store.get('game', null);
-if (saved && saved.players && saved.phase && !(saved.phase === 'done' && saved.recorded)) {
-  s = saved;
-  show('game');
-  render();
-  run();
+if (resumable(saved)) {
+  try {
+    s = saved;
+    show('game');
+    render();
+    run();
+  } catch {
+    s = null;
+    show('setup');
+  }
 } else {
   show('setup');
 }

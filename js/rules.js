@@ -84,3 +84,25 @@ export function nextRound(s) {
   const starter = isIn(s, loser) ? loser : nextIn(s, loser);
   return { ...s, ...freshRound(starter), round: s.round + 1 };
 }
+
+/** Whether a saved game has the shape these functions make, so a damaged or hand-edited save can be set aside. */
+export function isGame(s) {
+  const obj = v => !!v && typeof v === 'object' && !Array.isArray(v);
+  const count = n => Number.isInteger(n) && n >= 0;
+  const letters = t => typeof t === 'string' && /^[a-z]*$/.test(t);
+  if (!obj(s) || !Array.isArray(s.players) || s.players.length < 2) return false;
+  const seat = i => Number.isInteger(i) && i >= 0 && i < s.players.length;
+  if (!s.players.every(p => obj(p) && (p.kind === 'person' || p.kind === 'ghost') && typeof p.name === 'string' && count(p.letters))) return false;
+  if (!count(s.round) || !letters(s.frag) || !seat(s.turn) || !(s.last === -1 || seat(s.last))) return false;
+  if (!Array.isArray(s.moves) || !s.moves.every(m => obj(m) && seat(m.by) && letters(m.letter))) return false;
+  const c = s.challenge;
+  const challenged = obj(c) && seat(c.by) && seat(c.of) && letters(c.extra) && count(c.tries);
+  if (s.phase === 'play') return true;
+  if (s.phase === 'naming') return challenged;
+  const r = s.result;
+  if ((s.phase !== 'over' && s.phase !== 'done') || !obj(r) || !seat(r.loser) || !letters(r.frag)) return false;
+  if (s.phase === 'done' && !(s.winner === -1 || seat(s.winner))) return false;
+  if (r.why === 'spelled') return letters(r.word);
+  if (r.why === 'named') return challenged && seat(r.by) && letters(r.word);
+  return r.why === 'bluff' && challenged;
+}
