@@ -257,6 +257,31 @@ assert.ok(await page.title(), 'the page did not load offline');
 assert.equal(await page.locator('#game').isVisible(), true);
 await ctx.setOffline(false);
 
+// If the big word list doesn't arrive (a dropped connection on a first visit), the game carries on without it.
+{
+  const ctx2 = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, reducedMotion: 'reduce', serviceWorkers: 'block' });
+  await ctx2.route('**/js/words-more.js', r => r.abort());
+  const page2 = await ctx2.newPage();
+  const uncaught = [];
+  page2.on('pageerror', e => uncaught.push(e.message));
+  await page2.goto(base);
+  const set2 = fn => page2.evaluate(`ghostGame.set((${fn})(ghostGame.rules, ghostGame.dict))`);
+  const wait2 = fn => page2.waitForFunction(fn, null, { timeout: 15000 });
+  // Hollis still takes his turn.
+  await set2(`(R) => ({ ...R.newGame([{ kind: 'person', name: 'You' }, { kind: 'ghost', ghost: 'hollis', name: 'Hollis' }]), frag: 'pl', last: 0, turn: 1 })`);
+  await wait2(() => ghostGame.state().frag.length === 3 || ghostGame.state().phase !== 'play');
+  // An everyday word still beats a challenge, and a rarer one can still be counted.
+  await set2(`(R, d) => R.setExtra(R.challenge(['g', 'h', 'o'].reduce((st, c) => R.addLetter(st, c, d.endsRound), ${youAndWisp})), 'st')`);
+  await page2.click('#done');
+  await wait2(() => !document.getElementById('result').hidden);
+  assert.equal(await page2.locator('#resultWord').textContent(), 'GHOST');
+  await set2(`(R) => R.setExtra(R.challenge({ ...${youAndWisp}, frag: 'qo', last: 0, turn: 1 }), 'ph')`);
+  await page2.click('#done');
+  await wait2(() => document.getElementById('countIt'));
+  assert.deepEqual(uncaught, [], 'errors without the big word list');
+  await ctx2.close();
+}
+
 assert.deepEqual(problems.filter(p => !p.startsWith('failed:')), [], 'problems while playing');
 await browser.close();
 server.close();

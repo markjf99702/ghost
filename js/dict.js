@@ -45,6 +45,8 @@ export const endsRound = frag => (frag.length >= MIN && nodeAt(frag)?.e) || 0;
 let more = null;
 const unsaid = new Set(); // words that count when a person names one, but a ghost never says
 let loading = null;
+// Resolves true once they're here. If they couldn't be fetched (a dropped connection on a first visit), it resolves
+// false and the game goes on with the round-ending words alone; a later call asks for them again.
 export const loadMore = () => (loading ||= import('./words-more.js').then(m => {
   more = decode(m.default).map(line => {
     if (!line.endsWith('!')) return line;
@@ -53,6 +55,9 @@ export const loadMore = () => (loading ||= import('./words-more.js').then(m => {
     return w;
   });
   return true;
+}, () => {
+  loading = null;
+  return false;
 }));
 export const moreReady = () => more !== null;
 
