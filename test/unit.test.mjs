@@ -63,6 +63,14 @@ test('slurs the filter list misses are left out too, so a ghost never names one'
   assert.ok(dict.endsRound('squawk'), 'SQUAW no longer cuts off SQUAWK');
 });
 
+test('a cornered ghost never spells a word that’s left out on its way to a rarer one', () => {
+  // Heading for COONSKIN, NEGRONI or RAPESEED, Hollis would spell COON, NEGRO or RAPE on the board, so those go too.
+  for (const start of ['butts', 'clit', 'coon', 'dago', 'dicky', 'fag', 'gook', 'hebe', 'mick', 'milf', 'mongs', 'negro', 'poof', 'rape',
+    'skeet', 'smut']) assert.equal(dict.anyWordStarts(start), false, `a word starts with ${start}`);
+  // They stay where words that end a round go the same way (SPIC, then SPICE), or a shorter one ends it first (PUSS).
+  for (const w of ['spicebush', 'pussycat']) assert.ok(dict.isWord(w), `${w} doesn’t count`);
+});
+
 test('no letters lead only to words the ghosts won’t use, and the card can always show a word that was there', () => {
   // Such letters were a trap: after ASS or TIT, Wisp challenged and lost to ASSUME or TITLE, Maud and Hollis bluffed and
   // owned up, and the card said there was no word.
