@@ -88,6 +88,25 @@ assert.equal((await page.locator('.player').count()), 2);
 await until(() => ghostGame.state().frag.length === 2 || ghostGame.state().phase !== 'play');
 assert.equal((await state()).turn, 0);
 
+// With motion on, the letters already on the table hold still while you choose, and when Wisp adds one.
+await page.emulateMedia({ reducedMotion: 'no-preference' });
+await setUp(`(R) => ({ ...${youAndWisp}, frag: 'pla', last: 1, turn: 0 })`);
+await page.waitForTimeout(700); // PLA fades in, once
+{
+  const fading = () => page.evaluate(() => [...document.querySelectorAll('#word span')].slice(0, 3).filter(sp => sp.getAnimations().length).length);
+  const n = await page.locator('.letter[data-letter="n"]').boundingBox();
+  const c = await page.locator('.letter[data-letter="c"]').boundingBox();
+  await page.mouse.move(n.x + n.width / 2, n.y + n.height / 2);
+  await page.mouse.down();
+  assert.equal(await fading(), 0, 'PLA faded in again when you pressed on N');
+  await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2, { steps: 4 });
+  assert.equal(await fading(), 0, 'PLA faded in again when you slid to C');
+  await page.mouse.up();
+  await until(() => ghostGame.state().frag.length === 5);
+  assert.equal(await fading(), 0, 'PLA faded in again when Wisp added a letter');
+}
+await page.emulateMedia({ reducedMotion: 'reduce' });
+
 // Challenged: spell the rest of a word on the board and say yes.
 await setUp(`(R, d) => {
   let s = ${youAndWisp};

@@ -215,9 +215,10 @@ main { position: relative; z-index: 1; }
   font-family: var(--display); font-weight: 700; letter-spacing: .08em; line-height: 1; text-align: center;
   white-space: nowrap; color: var(--ink); text-shadow: 0 0 22px rgba(237, 229, 211, .25);
 }
-.word span { display: inline-block; animation: appear .45s ease-out; }
+.word span { display: inline-block; }
+.word .new { animation: appear .45s ease-out; }
 .word .extra { color: var(--candle); text-shadow: 0 0 18px rgba(242, 193, 106, .4); }
-.word .pending { color: var(--spirit); opacity: .55; animation: none; }
+.word .pending { color: var(--spirit); opacity: .55; }
 .word .cursor { width: .55em; height: .08em; background: var(--muted); vertical-align: baseline; margin-left: .06em; animation: blink 1.1s steps(1) infinite; }
 .word.empty .cursor { width: .9em; }
 @keyframes appear { from { opacity: 0; filter: blur(6px); transform: translateY(-.15em); } }

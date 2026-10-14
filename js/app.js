@@ -27,6 +27,7 @@ let record = store.get('record', {});
 let s = null;   // the game in progress (see rules.js)
 let gen = 0;    // bumps whenever the game moves on, so a ghost that was mid-thought knows to stop
 let preview = null;
+let shown = ''; // the letters on the table when the word was last drawn
 
 dict.loadMore(); // the rarer words, for challenges; the everyday ones are already here
 
@@ -261,8 +262,14 @@ function renderWord() {
   const extra = naming ? s.challenge.extra : '';
   const person = personToAct() !== null;
   const pend = person && preview && !(naming && extra.length >= 20) ? preview : '';
-  const parts = [...s.frag].map(c => `<span>${big(c)}</span>`)
-    .concat([...extra].map(c => `<span class="extra">${big(c)}</span>`));
+  // Only letters that weren't showing last time fade in, so the word holds still while you choose the next one.
+  const word = s.frag + extra;
+  const from = word.startsWith(shown) ? shown.length : 0;
+  shown = word;
+  const parts = [...word].map((c, k) => {
+    const cls = [k >= s.frag.length ? 'extra' : '', k >= from ? 'new' : ''].join(' ').trim();
+    return `<span class="${cls}">${big(c)}</span>`;
+  });
   if (pend) parts.push(`<span class="pending">${big(pend)}</span>`);
   else if (person && (s.phase === 'play' || naming)) parts.push('<span class="cursor" aria-hidden="true"></span>');
   const n = s.frag.length + extra.length + 1;
