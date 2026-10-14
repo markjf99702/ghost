@@ -14,7 +14,8 @@
 //   more:  everything else that counts when you're challenged and have to name a word:
 //          SCOWL size 70, 12dicts and ENABLE together.
 // Words on the filter list are left out of both, so they never end a round, never count, and a ghost never says one.
-// So are the rude words made from them (RUDE and STARTS below). Other words that start with one are ordinary words.
+// So are the rude words made from them, and slurs the list doesn't have (RUDE, SLURS and STARTS below). Other words that
+// start with one are ordinary words.
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -52,18 +53,23 @@ function scowl(size) {
 }
 
 // Plenty of ordinary words start with a word on the filter list: assume, title, button, cocktail, analysis, scatter, spice.
-// Those are kept. These are the rude ones, left out like the list's own words: the words in RUDE, and every word that
-// starts with one in STARTS. A word is also left out when it's one of them with -s, -es or -ies on the end.
+// Those are kept. These are the rude ones, and the slurs the list doesn't have, left out like the list's own words: the
+// words in RUDE and SLURS, and every word that starts with one in STARTS. A word is also left out when it's one of them
+// with -s, -es or -ies on the end.
 const RUDE = ['anality', 'anally', 'asslike', 'boobie', 'buttock', 'cockish', 'cockup', 'cummed', 'cummer', 'cumshaw', 'dicked',
   'dickey', 'dickie', 'dickier', 'dickiest', 'dicking', 'dicky', 'mongo', 'mongoe', 'raped', 'raper', 'sext', 'spick', 'spunked',
   'spunkie', 'spunking', 'tittie'];
-const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bullshit', 'clitor', 'cocksuck', 'coprophil', 'dickhead',
-  'dildo', 'erotic', 'eunuch', 'fagg', 'fagin', 'fago', 'fellatio', 'fuck', 'gangbang', 'grope', 'homoerotic', 'incest', 'masturbat',
-  'mongol', 'negroid', 'negrophob', 'nigga', 'nigger', 'nipple', 'nude', 'nympho', 'orgasm', 'pantyliner', 'pooft', 'porn', 'scatolog',
-  'sexed', 'sexie', 'sexil', 'sexin', 'sexless', 'sexolog', 'sexploit', 'sexpot', 'sexting', 'sexual', 'shit', 'slut', 'smutt',
-  'sodomiz', 'spastic', 'topless', 'twat', 'vagina', 'voyeur', 'vulva', 'wank', 'whore'];
+const SLURS = ['abo', 'coolie', 'dago', 'darkey', 'darky', 'dyke', 'dyked', 'dyking', 'golliwog', 'golliwogg', 'gollywog', 'gook',
+  'gyp', 'gypped', 'gypper', 'gypping', 'gypsy', 'hebe', 'homo', 'honky', 'kraut', 'lezzie', 'mulatto', 'octoroon', 'peckerwood',
+  'pickaninny', 'quadroon', 'redskin', 'sambo', 'spaz', 'spazzes', 'squaw', 'whitey', 'whities', 'wog', 'wop', 'yid'];
+const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bullshit', 'clitor', 'cocksuck', 'coprophil',
+  'dickhead', 'dildo', 'erotic', 'eunuch', 'fagg', 'fagin', 'fago', 'fellatio', 'fuck', 'gangbang', 'grope', 'homoerotic',
+  'incest', 'masturbat', 'mongol', 'negroid', 'negrophob', 'nigga', 'nigger', 'nipple', 'nude', 'nympho', 'orgasm', 'pantyliner',
+  'pooft', 'porn', 'retard', 'scatolog', 'sexed', 'sexie', 'sexil', 'sexin', 'sexless', 'sexolog', 'sexploit', 'sexpot',
+  'sexting', 'sexual', 'shit', 'slut', 'smutt', 'sodomiz', 'spastic', 'topless', 'twat', 'vagina', 'voyeur', 'vulva', 'wank',
+  'whore'];
 
-const filter = new Set([...clean(read('filter.txt')), ...RUDE]);
+const filter = new Set([...clean(read('filter.txt')), ...RUDE, ...SLURS]);
 const filtered = w => filter.has(w) || (w.endsWith('s') && filter.has(w.slice(0, -1))) || (w.endsWith('es') && filter.has(w.slice(0, -2)))
   || (w.endsWith('ies') && filter.has(`${w.slice(0, -3)}y`)) || STARTS.some(start => w.startsWith(start));
 

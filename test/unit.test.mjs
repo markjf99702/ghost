@@ -54,6 +54,12 @@ test('words that only start with a rude word are ordinary words, and rude words 
   for (const w of ['fucked', 'bitchy', 'whorehouse', 'cocksucker', 'sexy', 'orgies', 'pussies']) assert.ok(!dict.isWord(w), `${w} counts`);
 });
 
+test('slurs the filter list misses are left out too, so a ghost never spells or names one', () => {
+  for (const w of ['dyke', 'dykes', 'gook', 'gyps', 'gypped', 'mulatto', 'squaw', 'retard', 'retarded', 'dago', 'dagoes', 'wops', 'yids',
+    'wogs', 'sambo', 'spaz', 'hebe', 'golliwog', 'abos', 'kraut', 'redskin', 'pickaninnies']) assert.ok(!dict.isWord(w), `${w} counts`);
+  assert.ok(dict.endsRound('squawk'), 'SQUAW no longer cuts off SQUAWK');
+});
+
 test('no letters lead only to words the ghosts won’t use, and the card can always show a word that was there', () => {
   // Such letters were a trap: after ASS or TIT, Wisp challenged and lost to ASSUME or TITLE, Maud and Hollis bluffed and
   // owned up, and the card said there was no word.
