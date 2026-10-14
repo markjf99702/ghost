@@ -172,6 +172,7 @@ await page.click('#challenge');
 await until(() => !document.getElementById('result').hidden);
 assert.match(await page.locator('#resultKicker').textContent(), /bluffing/i);
 assert.match(await page.locator('.result-loser').textContent(), /Wisp takes a G/);
+assert.equal(await page.locator('#resultAlso').textContent(), 'There isn’t one.', 'no word starts with QZ');
 
 // The board's own NO and YES work for you (the first seat), not just the plaques.
 await setUp(`(R, d) => R.addLetter(R.addLetter(${youAndWisp}, 'q', d.endsRound), 'z', d.endsRound, { bluff: true })`);
@@ -364,6 +365,12 @@ await ctx.setOffline(false);
   await set2(`(R) => R.setExtra(R.challenge({ ...${youAndWisp}, frag: 'qo', last: 0, turn: 1 }), 'ph')`);
   await page2.click('#done');
   await wait2(() => document.getElementById('countIt'));
+  // A caught bluff doesn't claim there's no word, as the big list might have one: QO… could have been QOPH.
+  await set2(`(R) => R.challenge({ ...${youAndWisp}, frag: 'qo', last: 0, turn: 1 })`);
+  await page2.click('#giveUp');
+  await wait2(() => !document.getElementById('result').hidden);
+  assert.match(await page2.locator('#resultKicker').textContent(), /bluffing/i);
+  assert.equal(await page2.locator('#resultAlso').isHidden(), true, `the card says: ${await page2.locator('#resultAlso').textContent()}`);
   assert.deepEqual(uncaught, [], 'errors without the big word list');
   await ctx2.close();
 }

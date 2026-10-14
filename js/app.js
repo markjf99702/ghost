@@ -382,7 +382,8 @@ function showResult() {
     word = `${big(r.frag)}…`;
     why = `${esc(isYou(of) ? 'You' : of.name)} couldn’t name a word that starts with ${big(r.frag)}.`;
     const real = dict.exampleWord(r.frag);
-    also = real ? `${big(real)} would have done it.` : 'There isn’t one.';
+    // Without the big list (it didn't download) a rarer word might still have done it, so only say there's none with it here.
+    also = real ? `${big(real)} would have done it.` : dict.moreReady() && !dict.anyWordStarts(r.frag) ? 'There isn’t one.' : '';
   }
   $('resultKicker').textContent = kicker;
   $('resultWord').textContent = word;
