@@ -160,6 +160,7 @@ function doChallenge() {
 
 async function submitWord() {
   const word = s.frag + s.challenge.extra;
+  if (word.length < dict.MIN) return; // too short to count, whether it came from the plaque, YES or Enter
   await dict.loadMore();
   setState(R.nameWord(s, word, dict.isWord(word)));
 }
@@ -436,7 +437,7 @@ document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (/^[a-z]$/.test(k)) { pick(k); e.preventDefault(); }
   else if (k === 'backspace' && s.phase === 'naming' && personToAct() !== null && s.challenge.extra) setState(R.setExtra(s, s.challenge.extra.slice(0, -1)));
-  else if (k === 'enter' && s.phase === 'naming' && personToAct() !== null && (s.frag + s.challenge.extra).length >= dict.MIN) submitWord();
+  else if (k === 'enter' && s.phase === 'naming' && personToAct() !== null) submitWord();
 });
 
 addEventListener('resize', () => renderWord());

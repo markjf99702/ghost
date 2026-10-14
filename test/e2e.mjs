@@ -52,6 +52,10 @@ async function tap(letter) {
   const box = await page.locator(`.letter[data-letter="${letter}"]`).boundingBox();
   await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
 }
+async function tapCorner(which) {
+  const box = await page.locator(`.corner.${which}`).boundingBox();
+  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+}
 // Put the game into a particular spot, built with the real rules.
 async function setUp(fn) {
   await page.evaluate(`ghostGame.set((${fn})(ghostGame.rules, ghostGame.dict))`);
@@ -119,6 +123,14 @@ await tap('x');
 await page.click('#countIt');
 await until(() => !document.getElementById('result').hidden);
 assert.match(await page.locator('#resultKicker').textContent(), /challenge fails/i);
+
+// YES on the board needs four letters, like the plaque: Ben can't count CA.
+const annAndBen = `R.newGame([{ kind: 'person', name: 'Ann' }, { kind: 'person', name: 'Ben' }])`;
+await setUp(`(R) => R.challenge({ ...${annAndBen}, frag: 'ca', last: 1, turn: 0 })`);
+await tapCorner('yes');
+await page.waitForTimeout(300);
+assert.equal((await state()).challenge.tries, 0, 'YES tried CA as a word');
+assert.equal(await page.locator('#countIt').count(), 0);
 
 // Challenge a ghost that bluffed: it owns up.
 await setUp(`(R, d) => {
