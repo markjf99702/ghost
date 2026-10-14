@@ -81,6 +81,15 @@ test('word list files are generated and complete', async () => {
   assert.ok(count > 15000, `only ${count} round-ending words`);
 });
 
+test('How to play says how many words end a round, and that they aren’t all everyday ones', async () => {
+  const kinds = { 1: 0, 2: 0 };
+  (function walk(n) { if (n.e) kinds[n.e]++; for (const c in n.k) walk(n.k[c]); })(dict.root);
+  const help = (await readFile(new URL('../index.html', import.meta.url), 'utf8')).match(/<p>([^<]*words end a round[^<]*)<\/p>/)[1];
+  const about = `About ${(Math.round((kinds[1] + kinds[2]) / 1000) * 1000).toLocaleString('en-US')} words end a round`;
+  assert.ok(help.startsWith(about), `the help says “${help}”, but ${kinds[1] + kinds[2]} words end a round`);
+  assert.ok(kinds[2] > 0 && /less common/.test(help), `${kinds[2]} less common words end a round too`);
+});
+
 test('spelling a word ends the round, and the speller takes a letter', () => {
   let s = two();
   s = play(s, 'ghos');
