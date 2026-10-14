@@ -445,7 +445,8 @@ document.addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (/^[a-z]$/.test(k)) { pick(k); e.preventDefault(); }
   else if (k === 'backspace' && s.phase === 'naming' && personToAct() !== null && s.challenge.extra) setState(R.setExtra(s, s.challenge.extra.slice(0, -1)));
-  else if (k === 'enter' && s.phase === 'naming' && personToAct() !== null) submitWord();
+  // Enter names the word, unless a button has the focus: then Enter is that button's (Erase, Give up, a letter).
+  else if (k === 'enter' && s.phase === 'naming' && personToAct() !== null && !e.target.closest?.('button')) submitWord();
 });
 
 addEventListener('resize', () => renderWord());

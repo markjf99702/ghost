@@ -197,6 +197,26 @@ await page.click('#again');
 assert.equal((await state()).round, 1);
 assert.equal(await page.locator('#result').isHidden(), true);
 
+// Enter on a focused button does that button's job, without also naming the word.
+await setUp(`(R, d) => R.setExtra(R.challenge(['g', 'h', 'o'].reduce((st, c) => R.addLetter(st, c, d.endsRound), ${youAndWisp})), 'st')`);
+await page.focus('#erase');
+await page.keyboard.press('Enter');
+{
+  const s = await state();
+  assert.deepEqual([s.phase, s.challenge.extra], ['naming', 's'], 'Enter on Erase named GHOST instead of erasing');
+}
+await page.waitForTimeout(900); // a letter ignores a click within 800 ms of a tap on the board
+await page.focus('.letter[data-letter="t"]');
+await page.keyboard.press('Enter');
+{
+  const s = await state();
+  assert.deepEqual([s.challenge.extra, s.challenge.tries], ['st', 0], 'Enter on T tried GHOS as a word');
+}
+await page.evaluate(() => document.activeElement.blur());
+await page.keyboard.press('Enter'); // with no button focused, Enter names it
+await until(() => !document.getElementById('result').hidden);
+assert.equal(await page.locator('#resultWord').textContent(), 'GHOST');
+
 // The keyboard works on a computer.
 await setUp(`(R) => ${youAndWisp}`);
 await page.keyboard.press('k');
