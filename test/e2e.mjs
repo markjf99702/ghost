@@ -174,6 +174,16 @@ await tapCorner('yes');
 await until(() => !document.getElementById('result').hidden);
 assert.equal(await page.locator('#resultWord').textContent(), 'GHOST', 'YES didn’t name GHOST');
 
+// The word on the result card stays on one line on a phone, however long.
+await page.setViewportSize({ width: 360, height: 780 });
+for (const word of ['phantoms', 'uncharacteristically']) {
+  await setUp(`(R) => R.nameWord(R.setExtra(R.challenge({ ...${youAndWisp}, frag: '${word.slice(0, 3)}', last: 0, turn: 1 }), '${word.slice(3)}'), '${word}', true)`);
+  await until(() => !document.getElementById('result').hidden);
+  const lines = await page.evaluate(() => { const el = document.getElementById('resultWord'); return Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)); });
+  assert.equal(lines, 1, `${word.toUpperCase()} broke onto ${lines} lines`);
+}
+await page.setViewportSize({ width: 390, height: 844 });
+
 // A ghost challenges a letter that goes nowhere.
 await setUp(`(R) => ({ ...${youAndWisp}, frag: 'qu', last: 1, turn: 0 })`);
 await tap('x');

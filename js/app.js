@@ -384,7 +384,6 @@ function showResult() {
   }
   $('resultKicker').textContent = kicker;
   $('resultWord').textContent = word;
-  $('resultWord').style.fontSize = `${Math.min(56, Math.max(26, 300 / (word.length * 0.7)))}px`;
   $('resultWhy').innerHTML = why;
   $('resultAlso').textContent = also;
   $('resultAlso').hidden = !also;
@@ -414,6 +413,7 @@ function showResult() {
     $('nextRound').addEventListener('click', () => { hideResult(); board.goHome(); setState(R.nextRound(s)); });
   }
   $('result').hidden = false;
+  fitOnOneLine($('resultWord'), 56, 16);
   requestAnimationFrame(() => $('result').classList.add('shown'));
   actions.querySelector('.primary')?.focus({ preventScroll: true });
 }
@@ -430,6 +430,18 @@ function otherWay(word) {
     if (w && (!best || w.length < best.length)) best = w;
   }
   return best;
+}
+
+// Text as big as fits on one line of its box, up to `max` px, so a long word doesn't break in the middle.
+// Past `min` px it wraps instead.
+function fitOnOneLine(el, max, min) {
+  el.style.fontSize = `${max}px`;
+  el.style.whiteSpace = 'nowrap';
+  const text = document.createRange();
+  text.selectNodeContents(el);
+  const fit = el.clientWidth / text.getBoundingClientRect().width;
+  el.style.whiteSpace = '';
+  if (fit < 1) el.style.fontSize = `${Math.max(min, Math.floor(max * fit * 0.98))}px`; // a little spare, as text doesn't scale exactly
 }
 
 function hideResult() {
