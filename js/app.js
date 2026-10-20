@@ -168,17 +168,26 @@ function setState(next, { quiet = false } = {}) {
   if (!quiet) run();
 }
 
+// A person's letter or challenge. When it passes the board to another person, the board ignores taps for a moment, so a
+// quick double tap doesn't also play a letter for them. Nobody passes a phone that fast.
+function handOver(next) {
+  const was = personToAct();
+  setState(next);
+  const now = personToAct();
+  if (was !== null && now !== null && now !== was) board.settle(400);
+}
+
 function pick(c) {
   if (personToAct() === null) return;
   board.place(board.spots[c]);
   board.light(c);
-  if (s.phase === 'play') setState(R.addLetter(s, c, dict.endsRound));
+  if (s.phase === 'play') handOver(R.addLetter(s, c, dict.endsRound));
   else if (s.phase === 'naming' && s.challenge.extra.length < 20) setState(R.setExtra(s, s.challenge.extra + c));
 }
 
 function doChallenge() {
   board.light('no');
-  setState(R.challenge(s));
+  handOver(R.challenge(s));
 }
 
 async function submitWord() {
@@ -480,7 +489,7 @@ for (const d of [$('menu'), $('rules')]) d.addEventListener('click', e => { if (
 
 document.addEventListener('keydown', e => {
   if (!s || $('game').hidden || !$('result').hidden || e.metaKey || e.ctrlKey || e.altKey) return;
-  if (document.querySelector('dialog[open]') || e.target.matches?.('input')) return;
+  if (document.querySelector('dialog[open]') || e.target.matches?.('input') || board.settling()) return;
   const k = e.key.toLowerCase();
   if (/^[a-z]$/.test(k)) { pick(k); e.preventDefault(); }
   else if (k === 'backspace' && s.phase === 'naming' && personToAct() !== null && s.challenge.extra) setState(R.setExtra(s, s.challenge.extra.slice(0, -1)));

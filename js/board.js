@@ -20,6 +20,7 @@ export class Board {
     this.spots = {};
     this.pos = null;
     this.pointerAt = -Infinity;
+    this.settleUntil = -Infinity; // taps before this are ignored (see settle)
     this.trip = 0; // bumps when the planchette is sent home, so a ghost's glide that was under way doesn't land
 
     el.innerHTML = `
@@ -42,7 +43,7 @@ export class Board {
       // Keyboard and screen readers click; pointers are handled on the board, so skip the click a tap makes.
       b.addEventListener('click', e => {
         if (e.pointerType || performance.now() - this.pointerAt < 800) return;
-        if (this.enabled) this.onPick(c);
+        if (this.enabled && !this.settling()) this.onPick(c);
       });
       this.alphabet.append(b);
       this.letters[c] = b;
@@ -181,6 +182,11 @@ export class Board {
     if (!on) this.cancel();
   }
 
+  // Ignore taps for a moment. In pass and play the board goes straight to the next person after a move, so without this
+  // a quick double tap plays a letter for them too.
+  settle(ms) { this.settleUntil = performance.now() + ms; }
+  settling() { return performance.now() < this.settleUntil; }
+
   /** Buttons along the bottom of the board: [{ label, onClick, disabled, kind }] */
   setPlaques(list) {
     this.plaques.replaceChildren(...list.map(({ label, onClick, disabled, kind, id }) => {
@@ -190,7 +196,7 @@ export class Board {
       b.textContent = label;
       if (id) b.id = id;
       b.disabled = !!disabled;
-      b.addEventListener('click', onClick);
+      b.addEventListener('click', e => { if (!this.settling()) onClick(e); });
       return b;
     }));
   }
@@ -212,7 +218,7 @@ export class Board {
   }
 
   down(e) {
-    if (!this.enabled || e.button > 0 || e.target.closest('.plaque')) return;
+    if (!this.enabled || e.button > 0 || e.target.closest('.plaque') || this.settling()) return;
     const corner = this.corner(e);
     if (corner) { this.pressedCorner = corner; return; }
     e.preventDefault();

@@ -162,6 +162,40 @@ await page.waitForTimeout(300);
 assert.equal((await state()).challenge.tries, 0, 'YES tried CA as a word');
 assert.equal(await page.locator('#countIt').count(), 0);
 
+// The board goes straight to the next person, but a quick double tap plays one letter for Ann, not one each. A double
+// tap on Challenge doesn't give up for Ben either, though his Give up comes up under the same spot.
+{
+  await page.evaluate(() => { window.downs = []; document.getElementById('board').addEventListener('pointerdown', e => window.downs.push(e.timeStamp)); });
+  // Two quick taps in the middle of `selector`, tried again if the machine was too busy to make them quick.
+  async function tapTwice(selector, from) {
+    for (let tries = 1; ; tries++) {
+      await setUp(from);
+      const box = await page.locator(selector).boundingBox();
+      await page.evaluate(() => { window.downs = []; });
+      await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+      await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+      const gap = await page.evaluate(() => window.downs[1] - window.downs[0]);
+      if (gap < 300 || tries === 3) return gap;
+      await page.waitForTimeout(500);
+    }
+  }
+  let gap = await tapTwice('.letter[data-letter="c"]', `(R) => ${annAndBen}`);
+  assert.deepEqual((await state()).moves, [{ by: 0, letter: 'c' }], `two taps ${Math.round(gap)} ms apart played a letter each`);
+  await page.waitForTimeout(500);
+  await tap('a');
+  assert.deepEqual((await state()).moves.map(m => m.by), [0, 1], 'Ben couldn’t play once the moment had passed');
+  await page.waitForTimeout(500);
+  gap = await tapTwice('#challenge', `(R) => ({ ...${annAndBen}, frag: 'ca', last: 1, turn: 0 })`);
+  assert.equal((await state()).phase, 'naming', `two taps ${Math.round(gap)} ms apart on Challenge gave up for Ben too`);
+  await page.waitForTimeout(500);
+  // The same goes for a key pressed twice on a computer.
+  await setUp(`(R) => ${annAndBen}`);
+  await page.keyboard.press('c');
+  await page.keyboard.press('c');
+  assert.equal((await state()).frag, 'c', 'C pressed twice played a letter each');
+  await page.waitForTimeout(500);
+}
+
 // Challenge a ghost that bluffed: it owns up.
 await setUp(`(R, d) => {
   let s = R.addLetter(${youAndWisp}, 'q', d.endsRound);
