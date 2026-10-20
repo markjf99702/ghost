@@ -101,6 +101,11 @@ test('How to play says how many words end a round, and that they aren’t all ev
   assert.ok(kinds[2] > 0 && /less common/.test(help), `${kinds[2]} less common words end a round too`);
 });
 
+test('the installed app stays upright: held sideways, the word and the board don’t fit on the screen together', async () => {
+  const manifest = JSON.parse(await readFile(new URL('../manifest.webmanifest', import.meta.url), 'utf8'));
+  assert.equal(manifest.orientation, 'portrait');
+});
+
 test('spelling a word ends the round, and the speller takes a letter', () => {
   let s = two();
   s = play(s, 'ghos');
