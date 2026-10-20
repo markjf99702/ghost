@@ -10,7 +10,8 @@
 //   ends:  words that end the round when someone spells them. SCOWL size 50 (a normal spell checker's list),
 //          four letters or longer, kept only if 12dicts or ENABLE agree it's a word, and only the ones you can
 //          actually reach: "players" can never be spelled, because the round ends at "play".
-//          Each is marked with how common it is (SCOWL size 35 or not).
+//          Each is marked with how common it is (SCOWL size 35 or not). A few words hardly anyone says, which would cut
+//          off a common one (AMBUSH below: "belie" before "believe"), go in the other list instead.
 //   more:  everything else that counts when you're challenged and have to name a word:
 //          SCOWL size 70, 12dicts and ENABLE together.
 // Words on the filter list are left out of both, so they never end a round, never count, and a ghost never says one.
@@ -70,6 +71,12 @@ const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bull
   'sexting', 'sexual', 'shit', 'slut', 'smutt', 'sodomiz', 'spastic', 'topless', 'twat', 'vagina', 'voyeur', 'vulva', 'wank',
   'whore'];
 
+// Words hardly anyone says that would end the round just before a common one, so that one could never be spelled: BELIE
+// before BELIEVE, HIMS before HIMSELF, LEAS before LEAST, VIOL before VIOLIN. They go in the big list instead, so they
+// still count when you name one, but spelling one doesn't end the round. FIRS and PARE stay, as people know them.
+const AMBUSH = new Set(['awes', 'belie', 'burs', 'curio', 'curs', 'finis', 'fount', 'hims', 'intuit', 'kenned', 'leas', 'mote',
+  'physic', 'pock', 'posit', 'pries', 'sate', 'sere', 'sough', 'styli', 'thieve', 'viol', 'weal', 'wive']);
+
 const filter = new Set([...clean(read('filter.txt')), ...RUDE, ...SLURS]);
 const filtered = w => filter.has(w) || (w.endsWith('s') && filter.has(w.slice(0, -1))) || (w.endsWith('es') && filter.has(w.slice(0, -2)))
   || (w.endsWith('ies') && filter.has(`${w.slice(0, -3)}y`)) || STARTS.some(start => w.startsWith(start));
@@ -79,7 +86,7 @@ const enable = new Set(clean(read('enable1.txt')));
 const dicts = new Set(clean(read('12dicts/American/2of12inf.txt')));
 
 const long = w => w.length >= 4;
-const ends = [...s50].filter(w => long(w) && (enable.has(w) || dicts.has(w) || s35.has(w)) && !filtered(w)).sort();
+const ends = [...s50].filter(w => long(w) && (enable.has(w) || dicts.has(w) || s35.has(w)) && !filtered(w) && !AMBUSH.has(w)).sort();
 const endSet = new Set(ends);
 const reachable = ends.filter(w => {
   for (let k = 4; k < w.length; k++) if (endSet.has(w.slice(0, k))) return false;

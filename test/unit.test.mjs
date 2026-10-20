@@ -45,6 +45,17 @@ test('naming a word: rare words count, and so do words past a shorter one', () =
 test('an example word is short and common', () => {
   assert.equal(dict.exampleWord('gho'), 'ghost');
   assert.equal(dict.exampleWord('qx'), null);
+  assert.equal(dict.exampleWord('him'), 'himself', 'not HIMS');
+});
+
+test('words hardly anyone says don’t end a round just before a common one, and still count when named', () => {
+  for (const [rare, common] of [['belie', 'believe'], ['hims', 'himself'], ['leas', 'least'], ['finis', 'finish'], ['posit', 'position'],
+    ['viol', 'violin'], ['awes', 'awesome'], ['pries', 'priest'], ['sough', 'sought'], ['fount', 'fountain']]) {
+    assert.equal(dict.endsRound(rare), 0, `${rare} ends a round`);
+    assert.ok(dict.isWord(rare), `${rare} doesn’t count when named`);
+    assert.ok(dict.endsRound(common), `${common} doesn’t end a round`);
+  }
+  for (const w of ['firs', 'pare']) assert.ok(dict.endsRound(w), `${w} doesn’t end a round`);
 });
 
 test('words that only start with a rude word are ordinary words, and rude words made from one are left out', () => {
