@@ -56,6 +56,8 @@ test('words hardly anyone says don’t end a round just before a common one, and
     assert.ok(dict.endsRound(common), `${common} doesn’t end a round`);
   }
   for (const w of ['firs', 'pare']) assert.ok(dict.endsRound(w), `${w} doesn’t end a round`);
+  // Nothing comes after KENNED, so it still ends a round. In the big list it would leave the next player stuck.
+  assert.ok(dict.endsRound('kenned'), 'KENNED doesn’t end a round');
 });
 
 test('words that only start with a rude word are ordinary words, and rude words made from one are left out', () => {

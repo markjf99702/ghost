@@ -75,8 +75,9 @@ const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bull
 
 // Words hardly anyone says that would end the round just before a common one, so that one could never be spelled: BELIE
 // before BELIEVE, HIMS before HIMSELF, LEAS before LEAST, VIOL before VIOLIN. They go in the big list instead, so they
-// still count when you name one, but spelling one doesn't end the round. FIRS and PARE stay, as people know them.
-const AMBUSH = new Set(['awes', 'belie', 'burs', 'curio', 'curs', 'finis', 'fount', 'hims', 'intuit', 'kenned', 'leas', 'mote',
+// still count when you name one, but spelling one doesn't end the round. FIRS and PARE stay, as people know them, and so
+// does KENNED: nothing comes after it, so in the big list it would only leave the next player stuck.
+const AMBUSH = new Set(['awes', 'belie', 'burs', 'curio', 'curs', 'finis', 'fount', 'hims', 'intuit', 'leas', 'mote',
   'physic', 'pock', 'posit', 'pries', 'sate', 'sere', 'sough', 'styli', 'thieve', 'viol', 'weal', 'wive']);
 
 const filter = new Set([...clean(read('filter.txt')), ...RUDE, ...SLURS, ...VULGAR]);
