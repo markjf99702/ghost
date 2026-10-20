@@ -119,7 +119,8 @@ $('addPerson').addEventListener('click', () => {
 $('start').addEventListener('click', () => startGame());
 $('rulesLink').addEventListener('click', () => $('rules').showModal());
 
-function startGame() {
+// `again`: another game at the same table, from Play again or the menu.
+function startGame(again = false) {
   // "You" only makes sense when there's one of you.
   const solo = table.people.length === 1;
   const people = table.people.map((name, i) => {
@@ -128,8 +129,11 @@ function startGame() {
   });
   const ghosts = table.ghosts.map(id => ({ kind: 'ghost', ghost: id, name: ghostById(id).name }));
   if (people.length + ghosts.length < 2) return;
+  // The people sit first. Between good players whoever opens a game has a big edge, so in pass and play each game at the
+  // same table starts with the next person. Alone with the ghosts, you always start.
+  const opener = again && s ? ((s.opener ?? 0) + 1) % people.length : 0;
   hideResult();
-  setState(R.newGame([...people, ...ghosts]));
+  setState(R.newGame([...people, ...ghosts], opener));
   show('game');
   board.goHome(); // nothing lit from the last game, and the planchette resting in the middle
 }
@@ -417,7 +421,7 @@ function showResult() {
     actions.innerHTML = `<p class="verdict">${verdict}</p>
       <button type="button" class="primary" id="again">Play again</button>
       <button type="button" class="linkish" id="change">Change who’s playing</button>`;
-    $('again').addEventListener('click', () => startGame());
+    $('again').addEventListener('click', () => startGame(true));
     $('change').addEventListener('click', () => { hideResult(); store.set('game', null); s = null; show('setup'); });
     saveRecord();
   } else {
@@ -482,7 +486,7 @@ function saveRecord() {
 // ---------- Menu, keys, start-up ----------
 
 $('menuBtn').addEventListener('click', () => $('menu').showModal());
-$('menuNew').addEventListener('click', () => { $('menu').close(); startGame(); });
+$('menuNew').addEventListener('click', () => { $('menu').close(); startGame(true); });
 $('menuTable').addEventListener('click', () => { $('menu').close(); hideResult(); store.set('game', null); s = null; show('setup'); });
 $('menuRules').addEventListener('click', () => { $('menu').close(); $('rules').showModal(); });
 for (const d of [$('menu'), $('rules')]) d.addEventListener('click', e => { if (e.target === d) d.close(); });

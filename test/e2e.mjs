@@ -251,6 +251,7 @@ assert.match(await page.locator('.result-loser').textContent(), /That’s GHOST/
 assert.match(await page.locator('.verdict').textContent(), /Wisp wins the game/);
 await page.click('#again');
 assert.equal((await state()).round, 1);
+assert.equal((await state()).turn, 0, 'alone with the ghosts, you always start');
 assert.equal(await page.locator('#result').isHidden(), true);
 assert.equal(await page.locator('#board .lit').count(), 0, 'the last game’s T is still lit');
 assert.equal(await page.locator('.planchette.resting').count(), 1, 'the planchette isn’t resting');
@@ -369,6 +370,27 @@ await page.click('#start');
 assert.deepEqual((await state()).players.map(p => p.name), ['Player 1', 'Sam'], '“You” is only used when you play alone');
 await tap('c');
 assert.match(await page.locator('#status').textContent(), /Sam’s turn/);
+await page.waitForTimeout(500); // the board ignores taps for a moment after it changes hands
+
+// Each new game at the table starts with the next person: Play again, and New game from the menu.
+{
+  // Whoever is to move spells GHOST with their fifth letter, which ends the game.
+  const finish = async () => {
+    await setUp(`() => { const s = ghostGame.state(); return { ...s, players: s.players.map((p, i) => ({ ...p, letters: i === s.turn ? 4 : 0 })), frag: 'ghos', last: (s.turn + 1) % 2 }; }`);
+    await tap('t');
+    await until(() => !document.getElementById('result').hidden && document.getElementById('again'));
+  };
+  await finish();
+  await page.click('#again');
+  assert.deepEqual([(await state()).round, (await state()).turn], [1, 1], 'Player 1 opened the next game too');
+  assert.match(await page.locator('#status').textContent(), /Sam’s turn\. Pick any letter to start/);
+  await finish();
+  await page.click('#again');
+  assert.equal((await state()).turn, 0, 'Sam opened the third game too');
+  await page.click('#menuBtn');
+  await page.click('#menuNew');
+  assert.equal((await state()).turn, 1, 'Player 1 opened the game from the menu too');
+}
 
 // Works offline once it has been opened.
 await page.waitForFunction(() => navigator.serviceWorker?.controller, null, { timeout: 10000 }).catch(() => {});

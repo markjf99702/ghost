@@ -117,6 +117,16 @@ test('spelling a word ends the round, and the speller takes a letter', () => {
   assert.equal(s.round, 2);
 });
 
+test('a game can start with any seat, and games saved before the opener was kept still load', () => {
+  const s = R.newGame([{ kind: 'person', name: 'Ann' }, { kind: 'person', name: 'Ben' }, { kind: 'ghost', ghost: 'wisp', name: 'Wisp' }], 1);
+  assert.deepEqual([s.turn, s.last, s.round, s.opener], [1, -1, 1, 1], 'Ben opens round 1');
+  assert.equal(two().turn, 0, 'the first seat opens unless told otherwise');
+  assert.ok(R.isGame(s));
+  const { opener, ...old } = s;
+  assert.ok(R.isGame(old), 'a game saved before the opener was kept is set aside');
+  for (const bad of [3, -1, 'x', null]) assert.equal(R.isGame({ ...s, opener: bad }), false, `opener ${bad} passes`);
+});
+
 test('challenges: a named word beats the challenge, giving up loses', () => {
   let s = play(two(), 'gh');
   assert.ok(R.canChallenge(s));

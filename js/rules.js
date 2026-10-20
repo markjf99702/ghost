@@ -8,11 +8,13 @@
 
 export const GHOST = 'GHOST';
 
-export function newGame(players) {
+/** A new game, with `starter` (a seat) opening round 1. */
+export function newGame(players, starter = 0) {
   return {
     players: players.map(p => ({ ...p, letters: 0 })),
     round: 1,
-    ...freshRound(0),
+    opener: starter,
+    ...freshRound(starter),
   };
 }
 
@@ -94,6 +96,7 @@ export function isGame(s) {
   const seat = i => Number.isInteger(i) && i >= 0 && i < s.players.length;
   if (!s.players.every(p => obj(p) && (p.kind === 'person' || p.kind === 'ghost') && typeof p.name === 'string' && count(p.letters))) return false;
   if (!count(s.round) || !letters(s.frag) || !seat(s.turn) || !(s.last === -1 || seat(s.last))) return false;
+  if (s.opener !== undefined && !seat(s.opener)) return false; // games saved before the opener was kept have none
   if (!Array.isArray(s.moves) || !s.moves.every(m => obj(m) && seat(m.by) && letters(m.letter))) return false;
   const c = s.challenge;
   const challenged = obj(c) && seat(c.by) && seat(c.of) && letters(c.extra) && count(c.tries);
