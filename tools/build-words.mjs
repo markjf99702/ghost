@@ -65,7 +65,9 @@ const SLURS = ['abo', 'boche', 'cholo', 'coolie', 'dago', 'darkey', 'darky', 'dy
   'gollywog', 'gook', 'gyp', 'gypped', 'gypper', 'gypping', 'gypsied', 'gypsy', 'hebe', 'homo', 'honky', 'kaffir', 'kafir', 'kraut',
   'lezzie', 'lubra', 'mick', 'mulatto', 'octoroon', 'peckerwood', 'pickaninny', 'quadroon', 'redskin', 'sambo', 'shiksa', 'shikse',
   'spaz', 'spazzes', 'squaw', 'whitey', 'whities', 'wog', 'wop', 'yid'];
-const VULGAR = ['arses', 'bugger', 'cooch', 'crap', 'piss', 'sodding', 'sodomite', 'turd', 'weiner'];
+const VULGAR = ['arses', 'bugger', 'cooch', 'crap', 'piss', 'sodding', 'sodomite', 'turd', 'weiner',
+  // With CRAP and PISS gone, the round no longer ends before these, so they'd end it or be a cornered ghost's way out.
+  'crapped', 'crapper', 'crappier', 'crappiest', 'crapping', 'crappy', 'pissed'];
 const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bullshit', 'clitor', 'cocksuck', 'coprophil',
   'dickhead', 'dildo', 'erotic', 'eunuch', 'fagg', 'fagin', 'fago', 'fellatio', 'fuck', 'gangbang', 'grope', 'gypsy', 'homoerotic',
   'incest', 'masturbat', 'mongol', 'negroid', 'negrophob', 'nigga', 'nigger', 'nipple', 'nude', 'nympho', 'orgasm', 'pantyliner',

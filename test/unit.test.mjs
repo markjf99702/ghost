@@ -83,6 +83,17 @@ test('a few vulgar words are left out as well, and QUEER and SPOOK are still ord
   for (const w of ['queer', 'spook']) assert.ok([1, 2].includes(dict.endsRound(w)), `${w} doesn’t end a round`);
 });
 
+test('leaving out CRAP and PISS doesn’t let the words after them into play', () => {
+  // The round used to end at CRAP or PISS. Without them CRAPPY and PISSED would end a round, and a cornered ghost could head
+  // for CRAPPER or PISSOIR.
+  for (const w of ['crappy', 'crapped', 'crapping', 'crappier', 'crappiest', 'crapper', 'pissed', 'pissant', 'pisser', 'pissoir']) {
+    assert.ok(!dict.isWord(w), `${w} counts`);
+  }
+  assert.equal(dict.anyWordStarts('piss'), false, 'a word starts with PISS');
+  for (const w of ['crape', 'turducken']) assert.ok(dict.endsRound(w), `${w} doesn’t end a round`);
+  assert.equal(dict.exampleWord('crapp'), 'crappie', 'a challenged ghost at CRAPP doesn’t name CRAPPIE, the fish');
+});
+
 test('a cornered ghost never spells a word that’s left out on its way to a rarer one', () => {
   // Heading for COONSKIN, NEGRONI or RAPESEED, Hollis would spell COON, NEGRO or RAPE on the board, so those go too.
   for (const start of ['butts', 'clit', 'coon', 'dago', 'dicky', 'fag', 'gook', 'hebe', 'mick', 'milf', 'mongs', 'negro', 'poof', 'rape',
