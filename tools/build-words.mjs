@@ -15,8 +15,9 @@
 //   more:  everything else that counts when you're challenged and have to name a word:
 //          SCOWL size 70, 12dicts and ENABLE together.
 // Words on the filter list are left out of both, so they never end a round, never count, and a ghost never says one.
-// So are the rude words made from them, slurs the list doesn't have (RUDE, SLURS and STARTS below), and rarer words a
-// ghost could only reach by spelling one of those first (spellsFirst). Other words that start with one are ordinary words.
+// So are the rude words made from them, slurs the list doesn't have, a few vulgar words (RUDE, SLURS, VULGAR and STARTS
+// below), and rarer words a ghost could only reach by spelling one of those first (spellsFirst). Other words that start with
+// one are ordinary words.
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -54,9 +55,9 @@ function scowl(size) {
 }
 
 // Plenty of ordinary words start with a word on the filter list: assume, title, button, cocktail, analysis, scatter, spice.
-// Those are kept. These are the rude ones, and the slurs the list doesn't have, left out like the list's own words: the
-// words in RUDE and SLURS, and every word that starts with one in STARTS. A word is also left out when it's one of them
-// with -s, -es or -ies on the end.
+// Those are kept. These are the rude ones, the slurs the list doesn't have and a few vulgar words, left out like the list's
+// own words: the words in RUDE, SLURS and VULGAR, and every word that starts with one in STARTS. A word is also left out
+// when it's one of them with -s, -es or -ies on the end.
 const RUDE = ['anality', 'anally', 'asslike', 'boobie', 'buttock', 'cockish', 'cockup', 'cummed', 'cummer', 'cumshaw', 'dicked',
   'dickey', 'dickie', 'dickier', 'dickiest', 'dicking', 'dicky', 'mongo', 'mongoe', 'raped', 'raper', 'sext', 'spick', 'spunked',
   'spunkie', 'spunking', 'tittie'];
@@ -64,6 +65,7 @@ const SLURS = ['abo', 'boche', 'cholo', 'coolie', 'dago', 'darkey', 'darky', 'dy
   'gollywog', 'gook', 'gyp', 'gypped', 'gypper', 'gypping', 'gypsied', 'gypsy', 'hebe', 'homo', 'honky', 'kaffir', 'kafir', 'kraut',
   'lezzie', 'lubra', 'mick', 'mulatto', 'octoroon', 'peckerwood', 'pickaninny', 'quadroon', 'redskin', 'sambo', 'shiksa', 'shikse',
   'spaz', 'spazzes', 'squaw', 'whitey', 'whities', 'wog', 'wop', 'yid'];
+const VULGAR = ['arses', 'bugger', 'cooch', 'crap', 'piss', 'sodding', 'sodomite', 'turd', 'weiner'];
 const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bullshit', 'clitor', 'cocksuck', 'coprophil',
   'dickhead', 'dildo', 'erotic', 'eunuch', 'fagg', 'fagin', 'fago', 'fellatio', 'fuck', 'gangbang', 'grope', 'gypsy', 'homoerotic',
   'incest', 'masturbat', 'mongol', 'negroid', 'negrophob', 'nigga', 'nigger', 'nipple', 'nude', 'nympho', 'orgasm', 'pantyliner',
@@ -77,7 +79,7 @@ const STARTS = ['autoerotic', 'bareback', 'bastard', 'bastinado', 'bitch', 'bull
 const AMBUSH = new Set(['awes', 'belie', 'burs', 'curio', 'curs', 'finis', 'fount', 'hims', 'intuit', 'kenned', 'leas', 'mote',
   'physic', 'pock', 'posit', 'pries', 'sate', 'sere', 'sough', 'styli', 'thieve', 'viol', 'weal', 'wive']);
 
-const filter = new Set([...clean(read('filter.txt')), ...RUDE, ...SLURS]);
+const filter = new Set([...clean(read('filter.txt')), ...RUDE, ...SLURS, ...VULGAR]);
 const filtered = w => filter.has(w) || (w.endsWith('s') && filter.has(w.slice(0, -1))) || (w.endsWith('es') && filter.has(w.slice(0, -2)))
   || (w.endsWith('ies') && filter.has(`${w.slice(0, -3)}y`)) || STARTS.some(start => w.startsWith(start));
 

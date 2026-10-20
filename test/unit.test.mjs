@@ -74,6 +74,13 @@ test('slurs the filter list misses are left out too, so a ghost never names one'
   assert.ok(dict.endsRound('squawk'), 'SQUAW no longer cuts off SQUAWK');
 });
 
+test('a few vulgar words are left out as well, and QUEER and SPOOK are still ordinary words', () => {
+  for (const w of ['crap', 'piss', 'turd', 'bugger', 'sodding', 'sodomite', 'arses', 'cooch', 'weiner', 'turds', 'buggered']) {
+    assert.ok(!dict.isWord(w), `${w} counts`);
+  }
+  for (const w of ['queer', 'spook']) assert.ok([1, 2].includes(dict.endsRound(w)), `${w} doesn’t end a round`);
+});
+
 test('a cornered ghost never spells a word that’s left out on its way to a rarer one', () => {
   // Heading for COONSKIN, NEGRONI or RAPESEED, Hollis would spell COON, NEGRO or RAPE on the board, so those go too.
   for (const start of ['butts', 'clit', 'coon', 'dago', 'dicky', 'fag', 'gook', 'hebe', 'mick', 'milf', 'mongs', 'negro', 'poof', 'rape',
