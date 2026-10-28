@@ -57,7 +57,7 @@ To put it online with GitHub Pages: **Settings → Pages → Build and deploymen
 - `js/art.js`: the ghosts, the candles, the planchette, the sun and moon, all drawn as SVG.
 - `js/app.js`: the page: choosing who plays, turns, the ghosts' moves, the end of each round, and saving.
 - `fonts/`: Cinzel and EB Garamond (SIL Open Font License), served from here so nothing loads from elsewhere.
-- `sw.js`: keeps a copy for playing offline. `npm test` checks that it lists every file the page needs.
+- `sw.js`: keeps a copy for playing offline. `npm test` checks that it lists every file the page needs. On a connection that isn't answering, a page opens from that copy after four seconds. `FILES` in it is a fingerprint of the files it keeps: change one and `npm test` says what to set it to, so a release never leaves the copy half old.
 - `tools/`: the screenshot, icon, word-list and sim scripts above. `scripts/build.mjs`: the single-file build.
 
 The game is on `window.ghostGame` if you want to poke at it from the console:
